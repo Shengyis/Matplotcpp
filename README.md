@@ -8,12 +8,12 @@ Requirement:
 Install: put the header into your dir.
 
 Example:
+
     #include "matplot.h">
     using namespace plt;
     /*
         x, y are your eigen vector
     */
-
     figure();           // like plt.figure() in python
     plot(x, y, "o-");   // like plt.plot(x, y, 'o-') in python, here " is necessary, ' does not working
     show();             // like plt.show() in python
