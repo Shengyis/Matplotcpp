@@ -20,7 +20,7 @@ Example:
     int main() 
     { 
         /*
-            x, y are your vectors with same length or just basic type(int, double)
+            x, y are your vectors with same length or just basic type(like int, double)
         */
         figure();                                   // like plt.figure() in python
         plot(x, y, "o-");                           // like plt.plot(x, y, 'o-') in python, here " is necessary, ' does not work
