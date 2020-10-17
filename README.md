@@ -18,9 +18,11 @@ Example:
         /*
             x, y are your vectors with same length or just basic type(int, double)
         */
-        figure();           // like plt.figure() in python
-        plot(x, y, "o-");   // like plt.plot(x, y, 'o-') in python, here " is necessary, ' does not work
-        show();             // like plt.show() in python
+        figure();                                   // like plt.figure() in python
+        plot(x, y, "o-");                           // like plt.plot(x, y, 'o-') in python, here " is necessary, ' does not work
+        plot(x, y, ".-", {{"label"}, {"stars"}})    // like plt.plot(x, y, 'o', label = 'stars') in python
+        legend()                                    // like plt.legend() in python
+        show();                                     // like plt.show() in python
     }
 
 Remark:
