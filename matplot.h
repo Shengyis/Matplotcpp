@@ -1,20 +1,14 @@
 #pragma once
-#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/Core>
 #include <python/Python.h>
 
 namespace plt
 {
     static bool does_py_init = 0;
     static bool does_py_stop = 0;
-    static bool does_load_pyplot;
+    static bool does_load_pyplot = 0;
 
     static PyObject *pModule;
-    static PyObject *pFigure;
-    static PyObject *pPlot;
-    static PyObject *pSubplot;
-    static PyObject *pShow;
-    static PyObject *pXlim;
-    static PyObject *pYlim;
 
     void py_init()
     {
@@ -30,43 +24,45 @@ namespace plt
         py_init();
         if (!does_load_pyplot)
         {
-            pModule = PyImport_Import(PyUnicode_FromString("matplotlib.pyplot"));
-            pFigure = PyObject_GetAttrString(pModule, "figure");
-            pPlot = PyObject_GetAttrString(pModule, "plot");
-            pSubplot = PyObject_GetAttrString(pModule, "subplot");
-            pShow = PyObject_GetAttrString(pModule, "show");
-            pXlim = PyObject_GetAttrString(pModule, "xlim");
-            pYlim = PyObject_GetAttrString(pModule, "ylim");
+            PyRun_SimpleString("import matplotlib");
+            PyRun_SimpleString("matplotlib.rcParams['text.usetex'] = True");
+            pModule = PyImport_ImportModule("matplotlib.pyplot");
+
             does_load_pyplot = 1;
         }
+    }
+
+    PyObject *getPltFun(const char *argv)
+    {
+        return PyObject_GetAttrString(pModule, argv);
+    }
+
+    void setVal(PyObject *pV, const Eigen::VectorXd &v)
+    {
+        int n = PyList_Size(pV);
+        for (int i = 0; i < n; ++i)
+            PyList_SetItem(pV, i, PyFloat_FromDouble(v(i)));
     }
 
     void figure()
     {
         load_pyplot();
-        PyObject_CallFunctionObjArgs(pFigure, NULL);
+        PyObject_CallFunctionObjArgs(getPltFun("figure"), NULL);
     }
 
     void show()
     {
-        PyObject_CallFunctionObjArgs(pShow, NULL);
-    }
-
-    void setVal(PyObject *pV, const Eigen::VectorXd &v)
-    {
-        int n = v.size();
-        for (int i = 0; i < n; ++i)
-            PyList_SetItem(pV, i, PyFloat_FromDouble(v(i)));
+        PyObject_CallFunctionObjArgs(getPltFun("show"), NULL);
     }
 
     void plot(const double &x, const double &y)
     {
-        PyObject_CallFunctionObjArgs(pPlot, PyFloat_FromDouble(x), PyFloat_FromDouble(y), NULL);
+        PyObject_CallFunctionObjArgs(getPltFun("plot"), PyFloat_FromDouble(x), PyFloat_FromDouble(y), NULL);
     }
 
     void plot(const double &x, const double &y, const char *argv)
     {
-        PyObject_CallFunctionObjArgs(pPlot, PyFloat_FromDouble(x), PyFloat_FromDouble(y), PyUnicode_FromString(argv), NULL);
+        PyObject_CallFunctionObjArgs(getPltFun("plot"), PyFloat_FromDouble(x), PyFloat_FromDouble(y), PyUnicode_FromString(argv), NULL);
     }
 
     void plot(const Eigen::VectorXd &x, const Eigen::VectorXd &y)
@@ -76,7 +72,7 @@ namespace plt
         static PyObject *py = PyList_New(n);
         setVal(px, x);
         setVal(py, y);
-        PyObject_CallFunctionObjArgs(pPlot, px, py, NULL);
+        PyObject_CallFunctionObjArgs(getPltFun("plot"), px, py, NULL);
     }
 
     void plot(const Eigen::VectorXd &x, const Eigen::VectorXd &y, const char *argv)
@@ -86,17 +82,31 @@ namespace plt
         static PyObject *py = PyList_New(n);
         setVal(px, x);
         setVal(py, y);
-        PyObject_CallFunctionObjArgs(pPlot, px, py, PyUnicode_FromString(argv), NULL);
+        PyObject_CallFunctionObjArgs(getPltFun("plot"), px, py, PyUnicode_FromString(argv), NULL);
     }
 
-    void xlim(int a, int b)
+    void xlim(double a, double b)
     {
-        PyObject_CallFunctionObjArgs(pXlim, PyLong_FromLong(a), PyLong_FromLong(b), NULL);
+        PyObject_CallFunctionObjArgs(getPltFun("xlim"), PyFloat_FromDouble(a), PyFloat_FromDouble(b), NULL);
     }
 
-    void ylim(int a, int b)
+    void ylim(double a, double b)
     {
-        PyObject_CallFunctionObjArgs(pYlim, PyLong_FromLong(a), PyLong_FromLong(b), NULL);
+        PyObject_CallFunctionObjArgs(getPltFun("ylim"), PyFloat_FromDouble(a), PyFloat_FromDouble(b), NULL);
     }
 
+    void title(const char *argv)
+    {
+        PyObject_CallFunctionObjArgs(getPltFun("title"), PyUnicode_FromString(argv), NULL);
+    }
+
+    void xlabel(const char *argv)
+    {
+        PyObject_CallFunctionObjArgs(getPltFun("xlabel"), PyUnicode_FromString(argv), NULL);
+    }
+
+    void ylabel(const char *argv)
+    {
+        PyObject_CallFunctionObjArgs(getPltFun("ylabel"), PyUnicode_FromString(argv), NULL);
+    }
 } // namespace plt
