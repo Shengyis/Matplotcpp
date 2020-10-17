@@ -1,6 +1,7 @@
 A simple cpp header for calling plot functions in python. Now it can work directly with dense vectors in Eigen3.
 
 Requirement:
+
     1. python3.x, Eigen3 for vectors plotting.
     2. make sure Python.h in your include path.
     3. make sure libpython3.8 (or equivalent one, incase you change this lib to your custom name), libpython2.* does not work!
@@ -15,7 +16,7 @@ Example:
         x, y are your eigen vector
     */
     figure();           // like plt.figure() in python
-    plot(x, y, "o-");   // like plt.plot(x, y, 'o-') in python, here " is necessary, ' does not working
+    plot(x, y, "o-");   // like plt.plot(x, y, 'o-') in python, here " is necessary, ' does not work
     show();             // like plt.show() in python
 
 Remark:
