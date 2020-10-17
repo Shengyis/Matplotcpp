@@ -3,8 +3,12 @@ A simple cpp header for calling plot functions in python. It can work with vecto
 Requirement:
 
     1. python3.x installed.
-    2. make sure Python.h in your include path.
-    3. make sure libpython3.x (or equivalent one, incase you change this lib to your custom name), libpython2.* does not work!
+    2. make sure "python\Python.h" in your include path. For example, you can do
+        
+            ln -s yourPythonRoot/Headers /usr/local/include/python
+
+       or just simply change "#include <python/Python.h>" in head file to #include "your Python.h"
+    3. when compiling, add -lpython3.x (or equivalent one, incase you change this lib to your custom name), -lpython2.x does not work!
 
 Install: put the header into your dir.
 
@@ -20,7 +24,7 @@ Example:
         */
         figure();                                   // like plt.figure() in python
         plot(x, y, "o-");                           // like plt.plot(x, y, 'o-') in python, here " is necessary, ' does not work
-        plot(x, y, ".-", {{"label", "stars"}})    // like plt.plot(x, y, 'o', label = 'stars') in python
+        plot(x, y, ".-", {{"label", "stars"}})      // like plt.plot(x, y, 'o', label = 'stars') in python
         legend()                                    // like plt.legend() in python
         show();                                     // like plt.show() in python
     }
