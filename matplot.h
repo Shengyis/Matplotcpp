@@ -91,7 +91,7 @@ namespace plt
     }
 
     template <typename Tx, typename Ty>
-    void plot(const Tx &x, const Ty &y, const std::map<std::string, std::string> &key = {})
+    void plot(const Tx &x, const Ty &y, const std::map<std::string, std::string> &key)
     {
         plot(x, y, "", key);
     }
