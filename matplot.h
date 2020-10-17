@@ -24,8 +24,6 @@ namespace plt
         py_init();
         if (!does_load_pyplot)
         {
-            PyRun_SimpleString("import matplotlib");
-            PyRun_SimpleString("matplotlib.rcParams['text.usetex'] = True");
             pModule = PyImport_ImportModule("matplotlib.pyplot");
 
             does_load_pyplot = 1;
@@ -85,6 +83,16 @@ namespace plt
         PyObject_CallFunctionObjArgs(getPltFun("plot"), px, py, PyUnicode_FromString(argv), NULL);
     }
 
+    void plot(const Eigen::VectorXd &x, const Eigen::VectorXd &y, const char *argv, const char *label)
+    {
+        int n = x.size();
+        static PyObject *px = PyList_New(n);
+        static PyObject *py = PyList_New(n);
+        setVal(px, x);
+        setVal(py, y);
+        PyObject_CallFunctionObjArgs(getPltFun("plot"), px, py, PyUnicode_FromString(argv), PyUnicode_FromString(label), NULL);
+    }
+
     void xlim(double a, double b)
     {
         PyObject_CallFunctionObjArgs(getPltFun("xlim"), PyFloat_FromDouble(a), PyFloat_FromDouble(b), NULL);
@@ -108,5 +116,10 @@ namespace plt
     void ylabel(const char *argv)
     {
         PyObject_CallFunctionObjArgs(getPltFun("ylabel"), PyUnicode_FromString(argv), NULL);
+    }
+
+    void legend()
+    {
+        PyObject_CallFunctionObjArgs(getPltFun("legend"), NULL);
     }
 } // namespace plt
