@@ -2,7 +2,7 @@
 #include <string>
 #include <map>
 #include <type_traits>
-#include <python/Python.h>
+#include <Python.h>
 
 namespace plt
 {
