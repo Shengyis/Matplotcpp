@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <map>
-#include <type_traits>
 #include <Python.h>
 
 namespace plt
