@@ -124,4 +124,4 @@ namespace plt
     {
         PyObject_CallFunctionObjArgs(getPltFun("legend"), NULL);
     }
-} // namespace plt
+}; // namespace plt
