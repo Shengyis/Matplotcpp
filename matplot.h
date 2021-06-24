@@ -120,6 +120,16 @@ namespace plt
         PyObject_CallFunctionObjArgs(getPltFun("ylabel"), PyUnicode_FromString(str.c_str()), NULL);
     }
 
+    void xscale(const std::string &str)
+    {
+        PyObject_CallFunctionObjArgs(getPltFun("xscale"), PyUnicode_FromString(str.c_str()), NULL);
+    }
+
+    void yscale(const std::string &str)
+    {
+        PyObject_CallFunctionObjArgs(getPltFun("yscale"), PyUnicode_FromString(str.c_str()), NULL);
+    }
+
     void legend()
     {
         PyObject_CallFunctionObjArgs(getPltFun("legend"), NULL);
