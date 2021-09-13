@@ -40,7 +40,7 @@ namespace plt
         size_t n = v.size();
         PyObject *pV = PyList_New(n);
         for (int i = 0; i < n; ++i)
-            PyList_SetItem(pV, i, PyFloat_FromDouble(v[i]));
+            PyList_SetItem(pV, i, PyFloat_FromDouble(double(v[i])));
         return pV;
     }
 
