@@ -23,6 +23,17 @@ Example:
         plot(x, y, ".-", {{"label", "stars"}})      // like plt.plot(x, y, 'o', label = 'stars') in python
         legend()                                    // like plt.legend() in python
         show();                                     // like plt.show() in python
+
+        /*
+            x, y are Eigen::VectorXd, the followings are 2d contour/contourf plot
+        */
+        Eigen::MatrixXd X, Y, Z;                    
+        tie(X, Y) = meshgrid(x, y);                 // meshgrid function only works for Eigen::VectorXd
+        Z = your_function(X, Y);
+        contourf(X, Y, Z, 100);                     // default only plot levels, 
+        colorbar();                                 // another option is plotting levels curves like contour(X, Y, Z, {20.0, 30.0, 40.5})
+        show();                                     // or define vector<double> / Eigen::VectorXd / std::initializer_list<double> levels, then contour(X, Y, Z, levels);
+
     }
 
 Remark:
