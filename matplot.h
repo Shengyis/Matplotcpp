@@ -1,7 +1,9 @@
 #pragma once
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include <eigen3/Eigen/Core>
 #include <string>
 #include <initializer_list>
+#include <tuple>
 #include <map>
 #include <Python.h>
 #include <numpy/arrayobject.h>
@@ -13,6 +15,32 @@ namespace plt
     static bool does_load_pyplot = 0;
     static PyObject* plt;
     static PyObject* np;
+
+    template <typename Tx, typename Ty>
+    auto meshgrid(const Eigen::MatrixBase<Tx>& x, const Eigen::MatrixBase<Ty>& y)
+    {
+        int cols = x.size();
+        int rows = y.size();
+        Eigen::MatrixXd X(cols, rows), Y(cols, rows);
+        for (int k = 0; k < rows; ++k)
+            X.row(k) = x.transpose();
+        for (int k = 0; k < cols; ++k)
+            Y.col(k) = y;
+        return std::make_tuple(X, Y);
+    }
+
+    template <typename T>
+    auto meshgrid(const Eigen::MatrixBase<T>& x)
+    {
+        int cols = x.size();
+        int rows = cols;
+        Eigen::MatrixXd X(cols, rows), Y(cols, rows);
+        for (int k = 0; k < rows; ++k)
+            X.row(k) = x.transpose();
+        for (int k = 0; k < cols; ++k)
+            Y.col(k) = x;
+        return std::make_tuple(X, Y);
+    }
 
     void py_init()
     {
@@ -87,7 +115,7 @@ namespace plt
         npy_intp dim[2] = { rows, cols };
         npy_intp ind[2] = { 4, 5 };
         int nd = 2;
-        PyObject *pArray = PyArray_SimpleNewFromData(nd, dim, NPY_FLOAT64, const_cast<double*>(v.data()));
+        PyObject* pArray = PyArray_SimpleNewFromData(nd, dim, NPY_FLOAT64, const_cast<double*>(v.data()));
         return pArray;
     }
 
@@ -148,16 +176,16 @@ namespace plt
     template <typename Tx, typename Ty, typename Tz, typename Tlvl = int>
     void contourf(const Tx& x, const Ty& y, const Tz& z, const Tlvl& lvl = 10, const std::map<std::string, std::string>& key = {})
     {
-        PyObject *args = getContourArgs(x, y, z, lvl);
-        PyObject *kwargs = getKwargs(key);
+        PyObject* args = getContourArgs(x, y, z, lvl);
+        PyObject* kwargs = getKwargs(key);
         PyObject_Call(getPltFun("contourf"), args, kwargs);
     }
 
     template <typename Tx, typename Ty, typename Tz>
     void contourf(const Tx& x, const Ty& y, const Tz& z, const std::initializer_list<double>& lvl, const std::map<std::string, std::string>& key = {})
     {
-        PyObject *args = getContourArgs(x, y, z, lvl);
-        PyObject *kwargs = getKwargs(key);
+        PyObject* args = getContourArgs(x, y, z, lvl);
+        PyObject* kwargs = getKwargs(key);
         PyObject_Call(getPltFun("contourf"), args, kwargs);
     }
 
@@ -170,16 +198,16 @@ namespace plt
     template <typename Tx, typename Ty, typename Tz, typename Tlvl = int>
     void contour(const Tx& x, const Ty& y, const Tz& z, const Tlvl& lvl = 10, const std::map<std::string, std::string>& key = {})
     {
-        PyObject *args = getContourArgs(x, y, z, lvl);
-        PyObject *kwargs = getKwargs(key);
+        PyObject* args = getContourArgs(x, y, z, lvl);
+        PyObject* kwargs = getKwargs(key);
         PyObject_Call(getPltFun("contour"), args, kwargs);
     }
 
     template <typename Tx, typename Ty, typename Tz>
     void contour(const Tx& x, const Ty& y, const Tz& z, const std::initializer_list<double>& lvl, const std::map<std::string, std::string>& key = {})
     {
-        PyObject *args = getContourArgs(x, y, z, lvl);
-        PyObject *kwargs = getKwargs(key);
+        PyObject* args = getContourArgs(x, y, z, lvl);
+        PyObject* kwargs = getKwargs(key);
         PyObject_Call(getPltFun("contour"), args, kwargs);
     }
 
