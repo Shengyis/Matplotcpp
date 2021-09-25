@@ -1,5 +1,9 @@
 #pragma once
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#ifndef EIGEN_MATRIXBASE_PLUGIN
+#define EIGEN_MATRIXBASE_PLUGIN <MathTools/MatrixBaseAddons.h>
+#endif
+#include <eigen3/Eigen/Core>
 #include <string>
 #include <initializer_list>
 #include <tuple>
@@ -16,12 +20,11 @@ namespace plt
     static PyObject* np;
 
     template <typename Tx, typename Ty>
-    auto meshgrid(const Tx& x, const Ty& y)
+    auto meshgrid(const Eigen::MatrixBase<Tx>& x, const Eigen::MatrixBase<Ty>& y)
     {
         int cols = x.size();
         int rows = y.size();
-        Tx X(cols, rows);
-        Ty Y(cols, rows);
+        Eigen::MatrixXd X(cols, rows), Y(cols, rows);
         for (int k = 0; k < rows; ++k)
             X.row(k) = x.transpose();
         for (int k = 0; k < cols; ++k)
@@ -30,11 +33,11 @@ namespace plt
     }
 
     template <typename T>
-    auto meshgrid(const T& x)
+    auto meshgrid(const Eigen::MatrixBase<T>& x)
     {
         int cols = x.size();
         int rows = cols;
-        T X(cols, rows), Y(cols, rows);
+        Eigen::MatrixXd X(cols, rows), Y(cols, rows);
         for (int k = 0; k < rows; ++k)
             X.row(k) = x.transpose();
         for (int k = 0; k < cols; ++k)
