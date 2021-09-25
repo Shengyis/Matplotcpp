@@ -16,11 +16,12 @@ namespace plt
     static PyObject* np;
 
     template <typename Tx, typename Ty>
-    auto meshgrid(const Eigen::MatrixBase<Tx>& x, const Eigen::MatrixBase<Ty>& y)
+    auto meshgrid(const Tx& x, const Ty& y)
     {
         int cols = x.size();
         int rows = y.size();
-        Eigen::MatrixXd X(cols, rows), Y(cols, rows);
+        Tx X(cols, rows);
+        Ty Y(cols, rows);
         for (int k = 0; k < rows; ++k)
             X.row(k) = x.transpose();
         for (int k = 0; k < cols; ++k)
@@ -29,11 +30,11 @@ namespace plt
     }
 
     template <typename T>
-    auto meshgrid(const Eigen::MatrixBase<T>& x)
+    auto meshgrid(const T& x)
     {
         int cols = x.size();
         int rows = cols;
-        Eigen::MatrixXd X(cols, rows), Y(cols, rows);
+        T X(cols, rows), Y(cols, rows);
         for (int k = 0; k < rows; ++k)
             X.row(k) = x.transpose();
         for (int k = 0; k < cols; ++k)
