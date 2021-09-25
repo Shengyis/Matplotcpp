@@ -1,6 +1,5 @@
 #pragma once
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include <eigen3/Eigen/Core>
 #include <string>
 #include <initializer_list>
 #include <tuple>
