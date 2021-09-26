@@ -24,7 +24,7 @@ namespace plt
     {
         int cols = x.size();
         int rows = y.size();
-        Eigen::MatrixXd X(cols, rows), Y(cols, rows);
+        Eigen::MatrixXd X(rows, cols), Y(rows, cols);
         for (int k = 0; k < rows; ++k)
             X.row(k) = x.transpose();
         for (int k = 0; k < cols; ++k)
@@ -35,14 +35,7 @@ namespace plt
     template <typename T>
     auto meshgrid(const Eigen::MatrixBase<T>& x)
     {
-        int cols = x.size();
-        int rows = cols;
-        Eigen::MatrixXd X(cols, rows), Y(cols, rows);
-        for (int k = 0; k < rows; ++k)
-            X.row(k) = x.transpose();
-        for (int k = 0; k < cols; ++k)
-            Y.col(k) = x;
-        return std::make_tuple(X, Y);
+        return meshgrid(x, x);
     }
 
     void py_init()
@@ -115,10 +108,10 @@ namespace plt
     {
         npy_intp rows = v.rows();
         npy_intp cols = v.cols();
-        npy_intp dim[2] = { rows, cols };
-        npy_intp ind[2] = { 4, 5 };
+        npy_intp dim[2] = { cols, rows };
         int nd = 2;
         PyObject* pArray = PyArray_SimpleNewFromData(nd, dim, NPY_FLOAT64, const_cast<double*>(v.data()));
+        std::cout << PyArray_DIM(reinterpret_cast<PyArrayObject*>(pArray), 0) << std::endl;
         return pArray;
     }
 
