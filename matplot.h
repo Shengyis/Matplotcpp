@@ -149,6 +149,19 @@ namespace plt
         PyObject_CallFunctionObjArgs(getPltFun("figure"), NULL);
     }
 
+    void subplot(int pos, const std::map<std::string, std::string>& key = {})
+    {
+        PyObject* args = PyTuple_New(1);
+        PyTuple_SetItem(args, 0, getList(pos));
+        PyObject* kwargs = getKwargs(key);
+        PyObject_Call(getPltFun("subplot"), args, kwargs);
+    }
+
+    void subplot(const std::map<std::string, std::string>& key = {})
+    {
+        subplot(111, key);
+    }
+
     void show()
     {
         PyObject_CallFunctionObjArgs(getPltFun("show"), NULL);
