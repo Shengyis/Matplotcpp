@@ -111,7 +111,6 @@ namespace plt
         npy_intp dim[2] = { cols, rows };
         int nd = 2;
         PyObject* pArray = PyArray_SimpleNewFromData(nd, dim, NPY_FLOAT64, const_cast<double*>(v.data()));
-        std::cout << PyArray_DIM(reinterpret_cast<PyArrayObject*>(pArray), 0) << std::endl;
         return pArray;
     }
 
