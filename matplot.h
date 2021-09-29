@@ -106,11 +106,12 @@ namespace plt
     template <typename T>
     PyObject* getArray(const T& v)
     {
+        Eigen::Ref<const Eigen::MatrixXd> Rv(v);
         npy_intp rows = v.rows();
         npy_intp cols = v.cols();
         npy_intp dim[2] = { cols, rows };
         int nd = 2;
-        PyObject* pArray = PyArray_SimpleNewFromData(nd, dim, NPY_FLOAT64, const_cast<double*>(v.data()));
+        PyObject* pArray = PyArray_SimpleNewFromData(nd, dim, NPY_FLOAT64, const_cast<double*>(Rv.data()));
         return pArray;
     }
 
