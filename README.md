@@ -3,8 +3,9 @@ A simple cpp header for calling plot functions in python. It can work with vecto
 Requirement:
 
     1. python3.x installed.
-    2. make sure "Python.h" in your include path. 
-    3. when compiling, add -lpython3.x (or equivalent one, incase you change this lib to your custom name), -lpython2.x does not work!
+    2. eigen should be installed for 2d/3d plot.
+    3. make sure "Python.h" in your include path. 
+    4. when compiling, add -lpython3.x (or equivalent one, incase you change this lib to your custom name), -lpython2.x does not work!
 
 Install: put the header into your dir.
 
