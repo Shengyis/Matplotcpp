@@ -37,6 +37,16 @@ Example:
                                                     // or define vector<double> / Eigen::VectorXd / std::initializer_list<double> levels, 
                                                     // then contour(X, Y, Z, levels);
 
+        // subplot
+        figure();
+        subplot(211);
+        contourf(R, T, Z, 100);                     // R, T axis, Z the data. 
+        colorbar();
+        subplot(212, {{"projection", "polar"}});
+        contourf(T, R, Z, 100, {{"cmap", "jet"}});
+        colorbar();
+        show();
+
     }
 
 Remark:
