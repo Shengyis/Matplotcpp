@@ -1,8 +1,8 @@
 #pragma once
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#ifndef EIGEN_MATRIXBASE_PLUGIN
+/* #ifndef EIGEN_MATRIXBASE_PLUGIN
 #define EIGEN_MATRIXBASE_PLUGIN <MathTools/MatrixBaseAddons.h>
-#endif
+#endif */
 #include <eigen3/Eigen/Core>
 #include <string>
 #include <initializer_list>
@@ -19,7 +19,7 @@ namespace plt
     static PyObject* plt;
     static PyObject* np;
 
-    template <typename Tx, typename Ty>
+/*     template <typename Tx, typename Ty>
     auto meshgrid(const Eigen::MatrixBase<Tx>& x, const Eigen::MatrixBase<Ty>& y)
     {
         int cols = x.size();
@@ -36,7 +36,7 @@ namespace plt
     auto meshgrid(const Eigen::MatrixBase<T>& x)
     {
         return meshgrid(x, x);
-    }
+    } */
 
     void py_init()
     {
