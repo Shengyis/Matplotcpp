@@ -87,7 +87,7 @@ namespace plt
         npy_intp cols = v.cols();
         npy_intp dim[2] = { cols, rows };
         int nd = 2;
-        PyObject* pArray = PyArray_SimpleNewFromData(nd, dim, NPY_FLOAT64, const_cast<double*>(v.eval().data()));
+        PyObject* pArray = PyArray_SimpleNewFromData(nd, dim, NPY_DOUBLE, const_cast<double*>(v.data()));
         return pArray;
     }
 
@@ -161,7 +161,10 @@ namespace plt
     template <typename Tx, typename Ty, typename Tz, typename Tlvl = int>
     void contourf(const Tx& x, const Ty& y, const Tz& z, const Tlvl& lvl = 10, const std::map<std::string, std::string>& key = {})
     {
-        PyObject* args = getContourArgs(x, y, z, lvl);
+        auto xx = x.eval();
+        auto yy = y.eval();
+        auto zz = z.eval();
+        PyObject* args = getContourArgs(xx, yy, zz, lvl);
         PyObject* kwargs = getKwargs(key);
         PyObject_Call(getPltFun("contourf"), args, kwargs);
     }
@@ -169,7 +172,10 @@ namespace plt
     template <typename Tx, typename Ty, typename Tz>
     void contourf(const Tx& x, const Ty& y, const Tz& z, const std::initializer_list<double>& lvl, const std::map<std::string, std::string>& key = {})
     {
-        PyObject* args = getContourArgs(x, y, z, lvl);
+        auto xx = x.eval();
+        auto yy = y.eval();
+        auto zz = z.eval();
+        PyObject* args = getContourArgs(xx, yy, zz, lvl);
         PyObject* kwargs = getKwargs(key);
         PyObject_Call(getPltFun("contourf"), args, kwargs);
     }
@@ -183,7 +189,10 @@ namespace plt
     template <typename Tx, typename Ty, typename Tz, typename Tlvl = int>
     void contour(const Tx& x, const Ty& y, const Tz& z, const Tlvl& lvl = 10, const std::map<std::string, std::string>& key = {})
     {
-        PyObject* args = getContourArgs(x, y, z, lvl);
+        auto xx = x.eval();
+        auto yy = y.eval();
+        auto zz = z.eval();
+        PyObject* args = getContourArgs(xx, yy, zz, lvl);
         PyObject* kwargs = getKwargs(key);
         PyObject_Call(getPltFun("contour"), args, kwargs);
     }
@@ -191,7 +200,10 @@ namespace plt
     template <typename Tx, typename Ty, typename Tz>
     void contour(const Tx& x, const Ty& y, const Tz& z, const std::initializer_list<double>& lvl, const std::map<std::string, std::string>& key = {})
     {
-        PyObject* args = getContourArgs(x, y, z, lvl);
+        auto xx = x.eval();
+        auto yy = y.eval();
+        auto zz = z.eval();
+        PyObject* args = getContourArgs(xx, yy, zz, lvl);
         PyObject* kwargs = getKwargs(key);
         PyObject_Call(getPltFun("contour"), args, kwargs);
     }
@@ -215,6 +227,11 @@ namespace plt
     void title(const std::string& str)
     {
         PyObject_CallFunctionObjArgs(getPltFun("title"), PyUnicode_FromString(str.c_str()), NULL);
+    }
+
+    void suptitle(const std::string& str)
+    {
+        PyObject_CallFunctionObjArgs(getPltFun("suptitle"), PyUnicode_FromString(str.c_str()), NULL);
     }
 
     void xlabel(const std::string& str)
