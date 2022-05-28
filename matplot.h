@@ -9,26 +9,15 @@
 
 namespace plt
 {
-    static bool does_py_init = 0;
-    static bool does_py_stop = 0;
     static bool does_load_pyplot = 0;
     static PyObject* plt;
     static PyObject* np;
 
-    void py_init()
-    {
-        if (!does_py_init)
-        {
-            Py_Initialize();
-            does_py_init = 1;
-        }
-    }
-
     void load_pyplot()
     {
-        py_init();
         if (!does_load_pyplot)
         {
+            Py_Initialize();
             plt = PyImport_ImportModule("matplotlib.pyplot");
             np = PyImport_ImportModule("numpy");
             _import_array();
@@ -47,47 +36,43 @@ namespace plt
     }
 
     template <typename T>
-    PyObject* getList(const T& v)
-    {
-        size_t n = v.size();
-        PyObject* pList = PyList_New(n);
-        for (int i = 0; i < n; ++i)
-            PyList_SetItem(pList, i, PyFloat_FromDouble(double(v[i])));
-        return pList;
-    }
+    auto eval(const T& x) { return x.eval(); }
+    /* template <typename T>
+    auto eval(const std::initializer_list<T>& x) { return x; } */
+    template <>
+    auto eval(const double& x) { return x; }
+    template <>
+    auto eval(const int& x) { return x; }
 
     template <typename T>
-    PyObject* getList(const std::initializer_list<T>& v)
-    {
-        size_t n = v.size();
-        PyObject* pList = PyList_New(n);
-        for (int i = 0; i < n; ++i)
-            PyList_SetItem(pList, i, PyFloat_FromDouble(double(v.begin()[i])));
-        return pList;
-    }
-
-    template <>
-    PyObject* getList(const double& v)
-    {
-        PyObject* pList = PyFloat_FromDouble(v);
-        return pList;
-    }
-
-    template <>
-    PyObject* getList(const int& v)
-    {
-        PyObject* pList = PyLong_FromLong(v);
-        return pList;
-    }
-
-    template <typename T>
-    PyObject* getArray(const T& v)
+    PyObject* getPyData(const T& v)
     {
         npy_intp rows = v.rows();
         npy_intp cols = v.cols();
-        npy_intp dim[2] = { cols, rows };
-        int nd = 2;
-        PyObject* pArray = PyArray_SimpleNewFromData(nd, dim, NPY_DOUBLE, const_cast<double*>(v.data()));
+        npy_intp dim[] = { cols, rows };
+        int nd = (cols == 1 || rows == 1) ? 1 : 2;
+        int dim_start = (nd == 2 || rows == 1) ? 0 : 1;
+        PyObject* pArray = PyArray_SimpleNewFromData(nd, dim + dim_start, NPY_DOUBLE, const_cast<double*>(v.data()));
+        return pArray;
+    }
+    template <>
+    PyObject* getPyData(const std::initializer_list<double>& v)
+    {
+        npy_intp dim[] = { (npy_intp)v.size() };
+        int nd = 1;
+        PyObject* pArray = PyArray_SimpleNewFromData(nd, dim, NPY_DOUBLE, const_cast<double*>(v.begin()));
+        return pArray;
+    }
+    template <>
+    PyObject* getPyData(const double& v)
+    {
+        PyObject* pArray = PyFloat_FromDouble(v);
+        return pArray;
+    }
+    template <>
+    PyObject* getPyData(const int& v)
+    {
+        PyObject* pArray = PyLong_FromLong(v);
         return pArray;
     }
 
@@ -95,8 +80,8 @@ namespace plt
     PyObject* getPlotArgs(const Tx& x, const Ty& y, const std::string& str = "")
     {
         PyObject* pArgs = PyTuple_New(3);
-        PyTuple_SetItem(pArgs, 0, getList(x));
-        PyTuple_SetItem(pArgs, 1, getList(y));
+        PyTuple_SetItem(pArgs, 0, getPyData(x));
+        PyTuple_SetItem(pArgs, 1, getPyData(y));
         PyTuple_SetItem(pArgs, 2, PyUnicode_FromString(str.c_str()));
         return pArgs;
     }
@@ -105,10 +90,10 @@ namespace plt
     PyObject* getContourArgs(const Tx& x, const Ty& y, const Tz& z, const Tlvl& lvl = 10)
     {
         PyObject* pArgs = PyTuple_New(4);
-        PyTuple_SetItem(pArgs, 0, getArray(x));
-        PyTuple_SetItem(pArgs, 1, getArray(y));
-        PyTuple_SetItem(pArgs, 2, getArray(z));
-        PyTuple_SetItem(pArgs, 3, getList(lvl));
+        PyTuple_SetItem(pArgs, 0, getPyData(x));
+        PyTuple_SetItem(pArgs, 1, getPyData(y));
+        PyTuple_SetItem(pArgs, 2, getPyData(z));
+        PyTuple_SetItem(pArgs, 3, getPyData(lvl));
         return pArgs;
     }
 
@@ -120,34 +105,12 @@ namespace plt
         return pKwargs;
     }
 
-    void figure()
-    {
-        load_pyplot();
-        PyObject_CallFunctionObjArgs(getPltFun("figure"), NULL);
-    }
-
-    void subplot(int pos, const std::map<std::string, std::string>& key = {})
-    {
-        PyObject* args = PyTuple_New(1);
-        PyTuple_SetItem(args, 0, getList(pos));
-        PyObject* kwargs = getKwargs(key);
-        PyObject_Call(getPltFun("subplot"), args, kwargs);
-    }
-
-    void subplot(const std::map<std::string, std::string>& key = {})
-    {
-        subplot(111, key);
-    }
-
-    void show()
-    {
-        PyObject_CallFunctionObjArgs(getPltFun("show"), NULL);
-    }
-
     template <typename Tx, typename Ty>
     void plot(const Tx& x, const Ty& y, const std::string str = "", const std::map<std::string, std::string>& key = {})
     {
-        PyObject* args = getPlotArgs(x, y, str);
+        auto xx = eval(x);
+        auto yy = eval(y);
+        PyObject* args = getPlotArgs(xx, yy, str);
         PyObject* kwargs = getKwargs(key);
         PyObject_Call(getPltFun("plot"), args, kwargs);
     }
@@ -161,9 +124,9 @@ namespace plt
     template <typename Tx, typename Ty, typename Tz, typename Tlvl = int>
     void contourf(const Tx& x, const Ty& y, const Tz& z, const Tlvl& lvl = 10, const std::map<std::string, std::string>& key = {})
     {
-        auto xx = x.eval();
-        auto yy = y.eval();
-        auto zz = z.eval();
+        auto xx = eval(x);
+        auto yy = eval(y);
+        auto zz = eval(z);
         PyObject* args = getContourArgs(xx, yy, zz, lvl);
         PyObject* kwargs = getKwargs(key);
         PyObject_Call(getPltFun("contourf"), args, kwargs);
@@ -172,9 +135,9 @@ namespace plt
     template <typename Tx, typename Ty, typename Tz>
     void contourf(const Tx& x, const Ty& y, const Tz& z, const std::initializer_list<double>& lvl, const std::map<std::string, std::string>& key = {})
     {
-        auto xx = x.eval();
-        auto yy = y.eval();
-        auto zz = z.eval();
+        auto xx = eval(x);
+        auto yy = eval(y);
+        auto zz = eval(z);
         PyObject* args = getContourArgs(xx, yy, zz, lvl);
         PyObject* kwargs = getKwargs(key);
         PyObject_Call(getPltFun("contourf"), args, kwargs);
@@ -189,9 +152,9 @@ namespace plt
     template <typename Tx, typename Ty, typename Tz, typename Tlvl = int>
     void contour(const Tx& x, const Ty& y, const Tz& z, const Tlvl& lvl = 10, const std::map<std::string, std::string>& key = {})
     {
-        auto xx = x.eval();
-        auto yy = y.eval();
-        auto zz = z.eval();
+        auto xx = eval(x);
+        auto yy = eval(y);
+        auto zz = eval(z);
         PyObject* args = getContourArgs(xx, yy, zz, lvl);
         PyObject* kwargs = getKwargs(key);
         PyObject_Call(getPltFun("contour"), args, kwargs);
@@ -200,9 +163,9 @@ namespace plt
     template <typename Tx, typename Ty, typename Tz>
     void contour(const Tx& x, const Ty& y, const Tz& z, const std::initializer_list<double>& lvl, const std::map<std::string, std::string>& key = {})
     {
-        auto xx = x.eval();
-        auto yy = y.eval();
-        auto zz = z.eval();
+        auto xx = eval(x);
+        auto yy = eval(y);
+        auto zz = eval(z);
         PyObject* args = getContourArgs(xx, yy, zz, lvl);
         PyObject* kwargs = getKwargs(key);
         PyObject_Call(getPltFun("contour"), args, kwargs);
@@ -212,6 +175,30 @@ namespace plt
     void contour(const Tx& x, const Ty& y, const Tz& z, const std::map<std::string, std::string>& key)
     {
         contour(x, y, z, 10, key);
+    }
+
+    void figure()
+    {
+        load_pyplot();
+        PyObject_CallFunctionObjArgs(getPltFun("figure"), NULL);
+    }
+
+    void show()
+    {
+        PyObject_CallFunctionObjArgs(getPltFun("show"), NULL);
+    }
+
+    void subplot(int pos, const std::map<std::string, std::string>& key = {})
+    {
+        PyObject* args = PyTuple_New(1);
+        PyTuple_SetItem(args, 0, getPyData(pos));
+        PyObject* kwargs = getKwargs(key);
+        PyObject_Call(getPltFun("subplot"), args, kwargs);
+    }
+
+    void subplot(const std::map<std::string, std::string>& key = {})
+    {
+        subplot(111, key);
     }
 
     void xlim(double a, double b)
