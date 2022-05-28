@@ -1,11 +1,10 @@
-A simple cpp header for calling plot functions in python. It can work with vector type data with index operator [] is defined, such as std::vector, Eigen::VectorXd, etc.
+A simple cpp header for calling plot functions in python. Only Eigen is supported. 
 
 Requirement:
 
-    1. python3.x installed.
-    2. eigen should be installed for 2d/3d plot.
-    3. make sure "Python.h" in your include path. 
-    4. when compiling, add -lpython3.x (or equivalent one, incase you change this lib to your custom name), -lpython2.x does not work!
+    1. python3.x and Eigen installed.
+    2. make sure "Python.h" in your include path. 
+    3. when compiling, add -lpython3.x (or equivalent one, incase you change this lib to your custom name), -lpython2.x does not work!
 
 Install: put the header into your dir.
 
@@ -17,7 +16,7 @@ Example:
     int main() 
     { 
         /*
-            x, y are your vectors with same length or just basic type(like int, double)
+            x, y are your vectors
         */
         figure();                                   // like plt.figure() in python
         plot(x, y, "o-");                           // like plt.plot(x, y, 'o-') in python, here " is necessary, ' does not work
@@ -34,7 +33,7 @@ Example:
         contourf(X, Y, Z, 100);                     // default only plot 10 levels, 
         colorbar();                                 // another option is plotting specific level curves 
         show();                                     // such as contour(X, Y, Z, {20.0, 30.0, 40.5})
-                                                    // or define vector<double> / Eigen::VectorXd / std::initializer_list<double> levels, 
+                                                    // or define Eigen::VectorXd / std::initializer_list<double> levels, 
                                                     // then contour(X, Y, Z, levels);
 
         // subplot
